@@ -31,7 +31,7 @@ jobs:
           echo "response=$response" >> $GITHUB_OUTPUT
           
       - name: Verify deployment
-        if: steps.deploy.outputs.response != '200'
+        if: steps.deploy.outputs.response != '200' && steps.deploy.outputs.response != '202'
         run: |
           echo "Deployment failed with status: ${{ steps.deploy.outputs.response }}"
           echo "Triggering automatic rollback..."
@@ -43,7 +43,10 @@ jobs:
           exit 1
           
       - name: Deployment successful
-        if: steps.deploy.outputs.response == '200'
+        if: steps.deploy.outputs.response == '200' || steps.deploy.outputs.response == '202'
         run: |
           echo "Deployment to Render completed successfully"
           echo "Version: ${{ env.APP_VERSION }}"
+          if [ "${{ steps.deploy.outputs.response }}" == "202" ]; then
+            echo "Deploy accepted - processing in background"
+          fi
