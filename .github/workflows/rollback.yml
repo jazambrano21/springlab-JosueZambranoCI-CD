@@ -12,16 +12,37 @@ jobs:
       - name: Get last successful deploy
         id: last_deploy
         run: |
-          RESPONSE=$(curl -s -X GET "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys?status=done&limit=1" \
+          echo "Fetching last successful deploy from Render..."
+          RESPONSE=$(curl -s -X GET "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys?limit=10" \
             -H "accept: application/json" \
             -H "authorization: Bearer ${{ secrets.RENDER_API_KEY }}")
-          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
-          DEPLOY_ID=$(echo $RESPONSE | jq -r '.[0].id')
+          
+          echo "Response: $RESPONSE"
+          
+          DEPLOY_ID=$(echo $RESPONSE | jq -r '[.[] | select(.status == "live")][0].id')
+          DEPLOY_COMMIT=$(echo $RESPONSE | jq -r '[.[] | select(.status == "live")][0].commit.id')
+          
+          echo "Last successful deploy ID: $DEPLOY_ID"
+          echo "Last successful commit: $DEPLOY_COMMIT"
+          
           echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
+          echo "deploy_commit=$DEPLOY_COMMIT" >> $GITHUB_OUTPUT
 
       - name: Rollback to last successful deploy
+        if: steps.last_deploy.outputs.deploy_id != 'null' && steps.last_deploy.outputs.deploy_id != ''
         run: |
+          echo "Rolling back to deploy: ${{ steps.last_deploy.outputs.deploy_id }}"
           curl -X POST \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/${{ steps.last_deploy.outputs.deploy_id }}/retry" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
             -H "accept: application/json" \
-            -H "authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
+            -H "authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "content-type: application/json" \
+            -d '{"clearCache":"do_not_clear","commitId":"${{ steps.last_deploy.outputs.deploy_commit }}"}'
+          
+          echo "Rollback initiated successfully"
+          
+      - name: Rollback failed
+        if: steps.last_deploy.outputs.deploy_id == 'null' || steps.last_deploy.outputs.deploy_id == ''
+        run: |
+          echo "No successful deploy found to rollback to"
+          exit 1
