@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "arico-cesar-lab2",
+		"_postman_id": "zambrano-josue-lab2",
 		"name": "Spring Lab - Render Deployment",
 		"description": "API REST para gestión de estudiantes desplegada en Render",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fullName\": \"Cesar Arico\",\n  \"email\": \"cesar.arico@espe.edu.ec\",\n  \"birthDate\": \"2000-05-15\"\n}"
+							"raw": "{\n  \"fullName\": \"Josue Zambrano\",\n  \"email\": \"josue.zambrano@espe.edu.ec\",\n  \"birthDate\": \"2000-05-15\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/students",
@@ -165,7 +165,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "https://springlab-cesararico.onrender.com",
+			"value": "https://springlab-josuezambrano.onrender.com",
 			"type": "string"
 		},
 		{

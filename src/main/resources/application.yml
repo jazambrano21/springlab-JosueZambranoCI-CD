@@ -1,6 +1,6 @@
 app:
   version: ${APP_VERSION:local}
-  name: springlab-cesar-arico
+  name: springlab-josue-zambrano
 
 server:
   port: 8080
