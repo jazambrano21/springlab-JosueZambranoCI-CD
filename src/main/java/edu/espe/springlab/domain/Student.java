@@ -10,7 +10,7 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+//PRUEBA
     @Column(nullable = false, length = 120)
     private String fullName;
 
